@@ -1,0 +1,8 @@
+endpoints:
+  example:
+    url: http://localhost
+    host: example.com
+
+  local:
+    url: http://localhost:8080/actuator
+    host: test.localdev
