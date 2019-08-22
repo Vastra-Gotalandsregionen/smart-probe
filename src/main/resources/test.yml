@@ -6,3 +6,12 @@ endpoints:
   local:
     url: http://localhost:8080/actuator
     host: test.localdev
+
+  complex:
+    url: http://example.com:8080/asdf?p1=&p2=v2
+
+  ifeed-admin:
+    url: http://localhost:8280/
+    host: ifeed-admin-stage.vgregion.se
+
+

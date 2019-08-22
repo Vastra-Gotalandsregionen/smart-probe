@@ -25,16 +25,7 @@ public abstract class BaseAppConfig {
 
     @Bean
     protected ReactiveHealthIndicator createHealthIndicator() {
-        EndpointProperties endpointProperties;
-        try (InputStream inputStream = new FileInputStream(getYamlFile())) {
-
-            Yaml yaml = new Yaml();
-
-            endpointProperties = yaml.loadAs(inputStream, EndpointProperties.class);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        EndpointProperties endpointProperties = getEndpointProperties();
 
         Map<String, ReactiveHealthIndicator> beans = new HashMap<>();
 
@@ -59,6 +50,21 @@ public abstract class BaseAppConfig {
                 });
             }
         }*/;
+    }
+
+    @Bean
+    public EndpointProperties getEndpointProperties() {
+        EndpointProperties endpointProperties;
+        try (InputStream inputStream = new FileInputStream(getYamlFile())) {
+
+            Yaml yaml = new Yaml();
+
+            endpointProperties = yaml.loadAs(inputStream, EndpointProperties.class);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return endpointProperties;
     }
 
     protected abstract Map<? extends String,? extends ReactiveHealthIndicator> additionalHealthIndicators();
