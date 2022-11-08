@@ -1,13 +1,10 @@
 package se.vgregion.smartprobe;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.health.DefaultReactiveHealthIndicatorRegistry;
-import org.springframework.boot.actuate.health.HealthAggregator;
+import org.springframework.boot.actuate.health.CompositeReactiveHealthContributor;
+import org.springframework.boot.actuate.health.ReactiveHealthContributor;
 import org.springframework.boot.actuate.health.ReactiveHealthIndicator;
-import org.springframework.boot.actuate.health.ReactiveHealthIndicatorRegistry;
 import org.springframework.context.annotation.Bean;
 import org.yaml.snakeyaml.Yaml;
-import se.vgregion.smartprobe.healthcheck.LoadBalancerCompositeReactiveHealthIndicator;
 import se.vgregion.smartprobe.healthcheck.downstream.WebRequestHealthIndicator;
 import se.vgregion.smartprobe.properties.Endpoint;
 import se.vgregion.smartprobe.properties.EndpointProperties;
@@ -20,14 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class BaseAppConfig {
-    @Autowired
-    private HealthAggregator healthAggregator;
 
     @Bean
-    protected ReactiveHealthIndicator createHealthIndicator() {
+    protected CompositeReactiveHealthContributor createHealthIndicator() {
         EndpointProperties endpointProperties = getEndpointProperties();
 
-        Map<String, ReactiveHealthIndicator> beans = new HashMap<>();
+        Map<String, ReactiveHealthContributor> beans = new HashMap<>();
 
         for (Map.Entry<String, Endpoint> entry : endpointProperties.getEndpoints().entrySet()) {
             Endpoint endpoint = entry.getValue();
@@ -36,23 +31,11 @@ public abstract class BaseAppConfig {
 
         beans.putAll(additionalHealthIndicators());
 
-        ReactiveHealthIndicatorRegistry registry = new DefaultReactiveHealthIndicatorRegistry(beans);
-
-        return new LoadBalancerCompositeReactiveHealthIndicator(BaseAppConfig.this.healthAggregator, registry) /*{
-
-            @Override
-            public Mono<Health> health() {
-                return super.health().map(health -> {
-                    String statusText = health.getStatus().getCode().equals("UP") ? "ONLINE" : "OFFLINE";
-                    return Health.status(health.getStatus())
-                            .withDetail("lbStatus", statusText)
-                            .withDetails(health.getDetails()).build();
-                });
-            }
-        }*/;
+        return CompositeReactiveHealthContributor.fromMap(
+                beans
+        );
     }
 
-    @Bean
     public EndpointProperties getEndpointProperties() {
         EndpointProperties endpointProperties;
         try (InputStream inputStream = new FileInputStream(getYamlFile())) {

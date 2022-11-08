@@ -1,24 +1,21 @@
 package se.vgregion.smartprobe;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.CompositeReactiveHealthContributor;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import se.vgregion.smartprobe.properties.EndpointProperties;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public class SmartProbeApplicationTests {
 
 	@Autowired
-	EndpointProperties endpointProperties;
+	CompositeReactiveHealthContributor compositeReactiveHealthContributor;
 
 	@Test
 	public void contextLoads() {
-		assertNotNull(endpointProperties);
+		assertNotNull(compositeReactiveHealthContributor);
 	}
 
 }

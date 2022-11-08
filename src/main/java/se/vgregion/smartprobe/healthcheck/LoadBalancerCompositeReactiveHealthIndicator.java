@@ -1,25 +1,39 @@
 package se.vgregion.smartprobe.healthcheck;
 
-import org.springframework.boot.actuate.health.CompositeReactiveHealthIndicator;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthAggregator;
-import org.springframework.boot.actuate.health.ReactiveHealthIndicatorRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.*;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class LoadBalancerCompositeReactiveHealthIndicator extends CompositeReactiveHealthIndicator {
+@Component
+@Order(0)
+public class LoadBalancerCompositeReactiveHealthIndicator implements ReactiveHealthIndicator {
 
-    public LoadBalancerCompositeReactiveHealthIndicator(HealthAggregator healthAggregator,
-                                                        ReactiveHealthIndicatorRegistry registry) {
-        super(healthAggregator, registry);
+    @Autowired
+    private CompositeReactiveHealthContributor compositeReactiveHealthContributor;
+
+    public LoadBalancerCompositeReactiveHealthIndicator() {
     }
 
     @Override
     public Mono<Health> health() {
-        return super.health().map(health -> {
-            String statusText = health.getStatus().getCode().equals("UP") ? "ONLINE" : "OFFLINE";
-            return Health.status(health.getStatus())
-                    .withDetail("lbStatus", statusText)
-                    .withDetails(health.getDetails()).build();
+        return Flux.fromStream(compositeReactiveHealthContributor.stream()).flatMap(c -> {
+            ReactiveHealthContributor contributor = c.getContributor();
+
+            if (contributor instanceof ReactiveHealthIndicator) {
+                return ((ReactiveHealthIndicator) contributor).health();
+            }
+
+            return Mono.empty();
+        }).reduce((h1, h2) -> {
+            if (h1.getStatus().equals(Status.UP) && h2.getStatus().equals(Status.UP)) {
+                return Health.status(new Status("ONLINE")).build();
+            } else {
+                return Health.status(new Status("OFFLINE"))
+                        .build();
+            }
         });
     }
 }

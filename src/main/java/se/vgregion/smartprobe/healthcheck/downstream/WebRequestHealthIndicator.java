@@ -12,7 +12,6 @@ import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.client.HttpClientResponse;
 
-//@Component
 public class WebRequestHealthIndicator implements ReactiveHealthIndicator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebRequestHealthIndicator.class);
@@ -56,7 +55,6 @@ public class WebRequestHealthIndicator implements ReactiveHealthIndicator {
                     LOGGER.error(ex.getMessage(), ex);
                     return Mono.just(new Health.Builder().down(ex).build());
                 });
-
     }
 
     @Data
@@ -64,22 +62,5 @@ public class WebRequestHealthIndicator implements ReactiveHealthIndicator {
     static class ResponseWithBody {
         private HttpClientResponse httpClientResponse;
         private ByteBufFlux byteBufFlux;
-    }
-
-    private Health upHealth(HttpClientResponse response) {
-//        String body = response.currentContext().get(String.class);
-        return new Health.Builder().up().build();
-//        return new Health.Builder().status("ONLINE").build();
-    }
-
-    /*private Mono<Health> checkDownstreamServiceHealth() {
-        // we could use WebClient to check health reactively
-//        return Mono.just(new Health.Builder().down().build());
-        return Mono.just(upHealth());
-    }*/
-    private Mono<Health> checkDownstreamServiceHealth2() {
-        // we could use WebClient to check health reactively
-//        return Mono.just(new Health.Builder().down().build());
-        return Mono.just(new Health.Builder().down().build());
     }
 }

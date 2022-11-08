@@ -21,7 +21,8 @@ public class ProbeFileHealthIndicator implements ReactiveHealthIndicator {
 
         return using
                 .any(line -> line.toUpperCase().contains("ONLINE"))
-                .map(any -> any ? Health.up().build() : Health.down().build());
+                .map(any -> any ? Health.up().build() : Health.down().build())
+                .onErrorResume(throwable -> Mono.just(Health.down((Exception) throwable).build()));
     }
 
 }
