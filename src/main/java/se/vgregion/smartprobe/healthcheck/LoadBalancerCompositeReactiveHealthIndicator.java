@@ -19,6 +19,8 @@ public class LoadBalancerCompositeReactiveHealthIndicator implements ReactiveHea
 
     @Override
     public Mono<Health> health() {
+        Status online = new Status("ONLINE");
+
         return Flux.fromStream(compositeReactiveHealthContributor.stream()).flatMap(c -> {
             ReactiveHealthContributor contributor = c.getContributor();
 
@@ -28,8 +30,11 @@ public class LoadBalancerCompositeReactiveHealthIndicator implements ReactiveHea
 
             return Mono.empty();
         }).reduce((h1, h2) -> {
-            if (h1.getStatus().equals(Status.UP) && h2.getStatus().equals(Status.UP)) {
-                return Health.status(new Status("ONLINE")).build();
+            Status status1 = h1.getStatus();
+            Status status2 = h2.getStatus();
+            if ((status1.equals(Status.UP) || status1.equals(online))
+                    && (status2.equals(Status.UP) || status2.equals(online))) {
+                return Health.status(online).build();
             } else {
                 return Health.status(new Status("OFFLINE"))
                         .build();

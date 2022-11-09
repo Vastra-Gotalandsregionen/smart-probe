@@ -12,6 +12,8 @@ import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.client.HttpClientResponse;
 
+import java.time.Duration;
+
 public class WebRequestHealthIndicator implements ReactiveHealthIndicator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebRequestHealthIndicator.class);
@@ -28,6 +30,7 @@ public class WebRequestHealthIndicator implements ReactiveHealthIndicator {
     public Mono<Health> health() {
         return HttpClient
                 .create()
+                .responseTimeout(Duration.ofSeconds(10))
                 .headers(entries -> entries.add("Host", host))
                 .get()
                 .uri(url)
