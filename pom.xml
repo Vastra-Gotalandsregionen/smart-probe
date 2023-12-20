@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>se.vgregion</groupId>
-	<artifactId>smart-probe</artifactId>
+	<artifactId>smart-probe-liferay</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>smart-probe</name>
@@ -68,7 +68,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>smart-probe</finalName>
+		<finalName>smart-probe-liferay</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

@@ -14,7 +14,7 @@ public class ProbeFileHealthIndicator implements ReactiveHealthIndicator {
     @Override
     public Mono<Health> health() {
         Flux<String> using = Flux.using(
-                () -> Files.lines(Path.of(System.getProperty("user.home"), "probe.html")),
+                () -> Files.lines(Path.of(System.getProperty("user.home"), "probe-liferay.html")),
                 Flux::fromStream,
                 BaseStream::close
         );

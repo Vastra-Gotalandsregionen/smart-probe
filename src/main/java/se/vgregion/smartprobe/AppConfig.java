@@ -17,7 +17,7 @@ public class AppConfig extends BaseAppConfig {
 
     @Override
     protected File getYamlFile() {
-        return new File(System.getProperty("user.home") + "/.app/smart-probe/endpoints.yml");
+        return new File(System.getProperty("user.home") + "/.app/smart-probe-liferay/endpoints.yml");
     }
 
 }
