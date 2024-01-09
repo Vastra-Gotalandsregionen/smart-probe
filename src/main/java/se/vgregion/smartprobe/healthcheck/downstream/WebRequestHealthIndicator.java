@@ -55,7 +55,12 @@ public class WebRequestHealthIndicator implements ReactiveHealthIndicator {
                     }
                 })
                 .onErrorResume(ex -> {
-                    LOGGER.error(ex.getMessage(), ex);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.error(ex.getMessage(), ex);
+                    } else {
+                        LOGGER.error(ex.getMessage());
+                    }
+
                     return Mono.just(new Health.Builder().down(ex).build());
                 });
     }
